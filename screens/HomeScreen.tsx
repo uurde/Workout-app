@@ -14,7 +14,11 @@ export default function HomeScreen({ navigation }: NativeStackHeaderProps) {
                 keyExtractor={item => item.slug}
                 renderItem={({ item }) => {
                     return (
-                        <Pressable onPress={() => alert(`i am pressed - ${item.name}`)}>
+                        <Pressable
+                            onPress={() =>
+                                navigation.navigate("WorkoutDetail", { slug: item.slug })
+                            }
+                        >
                             <WorkoutItem item={item} />
                         </Pressable>
                     )
@@ -23,6 +27,14 @@ export default function HomeScreen({ navigation }: NativeStackHeaderProps) {
         </View>
     )
 };
+
+// const PressableItem = ({ item }: { item: Workout }) => {
+//     return (
+//         <Pressable onPress={() => alert(`i am pressed - ${item.name}`)}>
+//             <WorkoutItem item={item} />
+//         </Pressable>
+//     )
+// }
 
 const styles = StyleSheet.create({
     container: {
