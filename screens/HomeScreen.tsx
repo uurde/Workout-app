@@ -3,6 +3,7 @@ import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import data from "../data.json";
 import { Workout } from "../types/data";
 import WorkoutItem from "../components/WorkoutItem";
+import { MontserratText } from "../components/styled/MontserratText";
 
 export default function HomeScreen({ navigation }: NativeStackHeaderProps) {
 
@@ -26,6 +27,7 @@ const styles = StyleSheet.create({
     header: {
         fontSize: 20,
         marginBottom: 20,
-        fontWeight: "bold"
+        fontWeight: "bold",
+        fontFamily: "montserrat-bold"
     }
 });
