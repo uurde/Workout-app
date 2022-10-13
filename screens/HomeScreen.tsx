@@ -28,14 +28,6 @@ export default function HomeScreen({ navigation }: NativeStackHeaderProps) {
     )
 };
 
-// const PressableItem = ({ item }: { item: Workout }) => {
-//     return (
-//         <Pressable onPress={() => alert(`i am pressed - ${item.name}`)}>
-//             <WorkoutItem item={item} />
-//         </Pressable>
-//     )
-// }
-
 const styles = StyleSheet.create({
     container: {
         padding: 20,

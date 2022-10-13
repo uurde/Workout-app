@@ -1,7 +1,12 @@
-import { View, StyleSheet, Text, Pressable } from "react-native";
+import { View, StyleSheet, Text, Button } from "react-native";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { useWorkoutBySlug } from "../hooks/useWorkoutBySlug";
+import { Modal } from '../components/styled/Modal';
 import { PressableText } from "../components/styled/PressableText";
+import React from "react";
+import { formatSeconds } from "../utils/time";
+import { FontAwesome } from '@expo/vector-icons';
+import WorkoutItem from "../components/WorkoutItem";
 
 type DetailParams = {
     route: {
@@ -20,11 +25,37 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.header}>{workout.name}</Text>
-            <PressableText
-                onPress={() => alert("Opening Modal")}
-                text="Check Sequence"
-            />
+            <WorkoutItem
+                item={workout}
+                childStyles={{marginTop: 10}}
+            >
+                <Modal
+                    activator={({ handleOpen }) =>
+                        <PressableText
+                            onPress={handleOpen}
+                            text="Check Sequence"
+                        />
+                    }
+                >
+                    <View>
+                        {
+                            workout.sequence.map((seq, i) =>
+                                <View key={seq.slug} style={styles.sequenceItem}>
+                                    <Text>
+                                        {seq.name} | {seq.type} | {formatSeconds(seq.duration)}
+                                    </Text>
+                                    {i !== workout.sequence.length - 1 &&
+                                        <FontAwesome
+                                            name="arrow-down"
+                                            size={20}
+                                        />
+                                    }
+                                </View>
+                            )
+                        }
+                    </View>
+                </Modal>
+            </WorkoutItem>
         </View>
     )
 };
@@ -39,5 +70,8 @@ const styles = StyleSheet.create({
         marginBottom: 20,
         fontWeight: "bold",
         fontFamily: "montserrat-bold"
+    },
+    sequenceItem: {
+        alignItems: "center"
     }
 });
