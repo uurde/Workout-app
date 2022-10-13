@@ -7,6 +7,12 @@ export const getWorkouts = async (): Promise<Workout[]> => {
     return workouts;
 }
 
+export const getWorkoutBySlug = async (slug: string): Promise<Workout> => {
+    const workouts = await getWorkouts();
+    const workout = workouts.filter(x => x.slug === slug)[0];
+    return workout;
+}
+
 export const initWorkouts = async (): Promise<boolean> => {
     const hasWorkouts = await containsKey("workout-data");
     if (!hasWorkouts) {
@@ -16,6 +22,6 @@ export const initWorkouts = async (): Promise<boolean> => {
     return false;
 }
 
-export const clearWorkouts =async () => {
+export const clearWorkouts = async () => {
     await removeItem("workout-data");
 }
