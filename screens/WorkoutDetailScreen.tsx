@@ -1,12 +1,14 @@
-import { View, StyleSheet, Text, Button } from "react-native";
+import { View, StyleSheet, Text } from "react-native";
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import { useWorkoutBySlug } from "../hooks/useWorkoutBySlug";
 import { Modal } from '../components/styled/Modal';
 import { PressableText } from "../components/styled/PressableText";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { formatSeconds } from "../utils/time";
 import { FontAwesome } from '@expo/vector-icons';
 import WorkoutItem from "../components/WorkoutItem";
+import { SequenceItem } from "../types/data";
+import { useCountDown } from "../hooks/useCountDown";
 
 type DetailParams = {
     route: {
@@ -19,7 +21,16 @@ type DetailParams = {
 type Navigation = NativeStackHeaderProps & DetailParams;
 
 export default function WorkoutDetailScreen({ route }: Navigation) {
+    const [sequence, setSequence] = useState<SequenceItem[]>([]);
+    const [trackerId, setTrackerIdx] = useState(-1);
+
     const workout = useWorkoutBySlug(route.params.slug);
+    const countDown = useCountDown(trackerId, trackerId >= 0 ? sequence[trackerId].duration : -1);
+
+    const addItemToSequnce = (id: number) => {
+        setSequence([...sequence, workout!.sequence[id]]);
+        setTrackerIdx(id);
+    }
 
     if (!workout) return null;
 
@@ -27,7 +38,7 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
         <View style={styles.container}>
             <WorkoutItem
                 item={workout}
-                childStyles={{marginTop: 10}}
+                childStyles={{ marginTop: 10 }}
             >
                 <Modal
                     activator={({ handleOpen }) =>
@@ -56,6 +67,15 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                     </View>
                 </Modal>
             </WorkoutItem>
+            <View>
+                {sequence.length === 0 &&
+                    <FontAwesome
+                        name="play-circle-o"
+                        size={100}
+                        onPress={() => addItemToSequnce(0)}
+                    />
+                }
+            </View>
         </View>
     )
 };
