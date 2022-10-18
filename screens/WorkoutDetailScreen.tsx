@@ -22,10 +22,10 @@ type Navigation = NativeStackHeaderProps & DetailParams;
 
 export default function WorkoutDetailScreen({ route }: Navigation) {
     const [sequence, setSequence] = useState<SequenceItem[]>([]);
-    const [trackerId, setTrackerIdx] = useState(-1);
+    const [trackerId, setTrackerId] = useState(-1);
 
     const workout = useWorkoutBySlug(route.params.slug);
-    const countDown = useCountDown(trackerId, trackerId >= 0 ? sequence[trackerId].duration : -1);
+    const { countDown, isRunning, stop, start } = useCountDown(trackerId);
 
     useEffect(() => {
         if (!workout) return;
@@ -36,8 +36,17 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
     }, [countDown]);
 
     const addItemToSequence = (id: number) => {
-        setSequence([...sequence, workout!.sequence[id]]);
-        setTrackerIdx(id);
+        let newSequence = [];
+
+        if (id > 0) {
+            newSequence = [...sequence, workout!.sequence[id]];
+        } else {
+            newSequence = [workout!.sequence[id]];
+        }
+        
+        setSequence(newSequence);
+        setTrackerId(id);
+        start(newSequence[id].duration);
     }
 
     if (!workout) return null;
@@ -77,16 +86,36 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                     </View>
                 </Modal>
             </WorkoutItem>
-            <View style={styles.centerView}>
-                {sequence.length === 0 &&
-                    <FontAwesome
-                        name="play-circle-o"
-                        size={100}
-                        onPress={() => addItemToSequence(0)}
-                    />
-                }
+            <View style={styles.counterUI}>
+                <View style={styles.counterItem}>
+                    {sequence.length === 0 ?
+                        <FontAwesome
+                            name="play-circle-o"
+                            size={100}
+                            onPress={() => addItemToSequence(0)}
+                        /> :
+                        isRunning ?
+                            <FontAwesome
+                                name="stop-circle-o"
+                                size={100}
+                                onPress={() => stop()}
+                            /> :
+                            <FontAwesome
+                                name="play-circle-o"
+                                size={100}
+                                onPress={() => {
+                                    if (hasReachedEnd) {
+                                        addItemToSequence(0);
+                                    } else {
+                                        start(countDown);
+                                    }
+                                }
+                                }
+                            />
+                    }
+                </View>
                 {sequence.length > 0 && countDown >= 0 &&
-                    <View>
+                    <View style={styles.counterItem}>
                         <Text style={{ fontSize: 55 }}>
                             {countDown}
                         </Text>
@@ -118,10 +147,14 @@ const styles = StyleSheet.create({
     sequenceItem: {
         alignItems: "center"
     },
-    centerView: {
+    counterUI: {
         flexDirection: "row",
         justifyContent: "space-around",
         alignItems: "center",
         marginBottom: 20
+    },
+    counterItem: {
+        flex: 1,
+        alignItems: "center"
     }
 });
