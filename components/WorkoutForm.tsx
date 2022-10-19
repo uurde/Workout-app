@@ -1,29 +1,25 @@
 import { useState } from "react";
 import { View, Text, StyleSheet, TextInput } from "react-native";
 import { PressableText } from "./styled/PressableText";
+import { useForm, Controller } from "react-hook-form";
 
 export type ExerciseForm = {
     name: string,
-    duration: string
+    duration: string,
+    type: string,
+    reps?: string
 }
 
 type WorkoutProps = {
     onSubmit: (form: ExerciseForm) => void
 }
 
+const selectionItems = ["exercise", "strech", "break"];
+
 export default function WorkoutForm({ onSubmit }: WorkoutProps) {
 
-    const [form, setForm] = useState({
-        name: "",
-        duration: ""
-    });
-
-    const onChangeText = (name: string) => (text: string) => {
-        setForm({
-            ...form,
-            [name]: text
-        });
-    }
+    const { control, handleSubmit } = useForm();
+    const [isSelectionOn, setSelectionOn] = useState(false);
 
     return (
         <View style={styles.container}>
@@ -31,19 +27,86 @@ export default function WorkoutForm({ onSubmit }: WorkoutProps) {
                 Exercise Form
             </Text>
             <View>
-                <TextInput
-                    style={styles.input}
-                    value={form.name}
-                    onChangeText={onChangeText("name")}
-                />
-                <TextInput
-                    style={styles.input}
-                    value={form.duration}
-                    onChangeText={onChangeText("duration")}
-                />
+                <View style={styles.rowContainer}>
+                    <Controller
+                        control={control}
+                        rules={{ required: true }}
+                        name="name"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                style={styles.input}
+                                value={value}
+                                placeholder="Name"
+                            />
+                        }
+                    />
+                    <Controller
+                        control={control}
+                        rules={{ required: true }}
+                        name="duration"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                style={styles.input}
+                                value={value}
+                                placeholder="Duration"
+                            />
+                        }
+                    />
+                </View>
+                <View style={styles.rowContainer}>
+                    <Controller
+                        control={control}
+                        rules={{ required: false }}
+                        name="reps"
+                        render={({ field: { onChange, value } }) =>
+                            <TextInput
+                                onChangeText={onChange}
+                                style={styles.input}
+                                value={value}
+                                placeholder="Repetitions"
+                            />
+                        }
+                    />
+                    <Controller
+                        control={control}
+                        rules={{ required: true }}
+                        name="type"
+                        render={({ field: { onChange, value } }) =>
+                            <View style={{ flex: 1 }}>
+                                {isSelectionOn ?
+                                    <View>
+                                        {
+                                            selectionItems.map(selection =>
+                                                <PressableText
+                                                    style={styles.selection}
+                                                    key={selection}
+                                                    text={selection}
+                                                    onPressIn={() => {
+                                                        onChange(selection)
+                                                        setSelectionOn(false)}
+                                                    }
+                                                />
+                                            )
+                                        }
+                                    </View> :
+                                    <TextInput
+                                        style={styles.input}
+                                        placeholder="Type"
+                                        onPressIn={() => setSelectionOn(true)}
+                                        value={value}
+                                    />
+                                }
+                            </View>
+                        }
+                    />
+                </View>
                 <PressableText
                     text="Submit"
-                    onPress={() => onSubmit(form)}
+                    onPress={handleSubmit((data) => {
+                        onSubmit(data as ExerciseForm);
+                    })}
                 />
             </View>
         </View>
@@ -57,9 +120,20 @@ const styles = StyleSheet.create({
         padding: 10
     },
     input: {
-        height: 40,
-        margin: 12,
+        flex: 1,
+        margin: 2,
         borderWidth: 1,
-        padding: 10
+        height: 30,
+        padding: 5,
+        borderRadius: 5,
+        borderColor: "rgba(0,0,0,0.4)"
+    },
+    rowContainer: {
+        flexDirection: "row"
+    },
+    selection: {
+        margin: 2,
+        padding: 3,
+        alignSelf: "center"
     }
 });
