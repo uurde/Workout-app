@@ -67,23 +67,25 @@ export default function WorkoutDetailScreen({ route }: Navigation) {
                         />
                     }
                 >
-                    <View>
-                        {
-                            workout.sequence.map((seq, i) =>
-                                <View key={seq.slug} style={styles.sequenceItem}>
-                                    <Text>
-                                        {seq.name} | {seq.type} | {formatSeconds(seq.duration)}
-                                    </Text>
-                                    {i !== workout.sequence.length - 1 &&
-                                        <FontAwesome
-                                            name="arrow-down"
-                                            size={20}
-                                        />
-                                    }
-                                </View>
-                            )
-                        }
-                    </View>
+                    {() =>
+                        <View>
+                            {
+                                workout.sequence.map((seq, i) =>
+                                    <View key={seq.slug} style={styles.sequenceItem}>
+                                        <Text>
+                                            {seq.name} | {seq.type} | {formatSeconds(seq.duration)}
+                                        </Text>
+                                        {i !== workout.sequence.length - 1 &&
+                                            <FontAwesome
+                                                name="arrow-down"
+                                                size={20}
+                                            />
+                                        }
+                                    </View>
+                                )
+                            }
+                        </View>
+                    }
                 </Modal>
             </WorkoutItem>
             <View style={styles.wrapper}>

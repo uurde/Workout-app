@@ -23,9 +23,6 @@ export default function ExerciseForm({ onSubmit }: WorkoutProps) {
 
     return (
         <View style={styles.container}>
-            <Text>
-                Exercise Form
-            </Text>
             <View>
                 <View style={styles.rowContainer}>
                     <Controller
@@ -85,7 +82,8 @@ export default function ExerciseForm({ onSubmit }: WorkoutProps) {
                                                     text={selection}
                                                     onPressIn={() => {
                                                         onChange(selection)
-                                                        setSelectionOn(false)}
+                                                        setSelectionOn(false)
+                                                    }
                                                     }
                                                 />
                                             )
@@ -103,7 +101,8 @@ export default function ExerciseForm({ onSubmit }: WorkoutProps) {
                     />
                 </View>
                 <PressableText
-                    text="Submit"
+                    style={{ marginTop: 15 }}
+                    text="Add Exercise"
                     onPress={handleSubmit((data) => {
                         onSubmit(data as ExerciseFormData);
                     })}

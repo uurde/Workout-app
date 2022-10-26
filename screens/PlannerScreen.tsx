@@ -1,11 +1,14 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import slugify from "slugify";
-import { View, StyleSheet, FlatList } from "react-native"
+import { View, StyleSheet, FlatList, Text } from "react-native"
 import { NativeStackHeaderProps } from "@react-navigation/native-stack";
 import ExerciseForm, { ExerciseFormData } from "../components/ExerciseForm";
-import { SequenceItem, SequenceType } from "../types/data";
+import { SequenceItem, SequenceType, Workout } from "../types/data";
 import ExerciseItem from "../components/ExerciseItem";
 import { PressableText } from "../components/styled/PressableText";
+import { Modal } from "../components/styled/Modal";
+import WorkoutForm, { WorkoutFormData } from "../components/WorkoutForm";
+import { storeWorkout } from "../storage/workout";
 
 export default function PlannerScreen({ navigation }: NativeStackHeaderProps) {
 
@@ -17,7 +20,7 @@ export default function PlannerScreen({ navigation }: NativeStackHeaderProps) {
             name: form.name,
             type: form.type as SequenceType,
             duration: Number(form.duration)
-        };
+        }
 
         if (form.reps) {
             sequenceItem.reps = Number(form.reps);
@@ -26,11 +29,38 @@ export default function PlannerScreen({ navigation }: NativeStackHeaderProps) {
         setSequenceItems([...sequenceItems, sequenceItem]);
     }
 
+    const computeDiffuculty = (exercisesCount: number, workoutDuration: number) => {
+        const intensity = workoutDuration / exercisesCount;
+
+        if (intensity <= 60) {
+            return "hard";
+        } else if (intensity <= 120) {
+            return "normal";
+        } else {
+            return "easy";
+        }
+    }
+
+    const handleWorkoutSubmit = async (form: WorkoutFormData) => {
+
+        if (sequenceItems.length > 0) {
+            const duration = sequenceItems.reduce((acc, item) => {
+                return acc + item.duration
+            }, 0)
+
+            const workout: Workout = {
+                name: form.name,
+                slug: slugify(form.name + " " + Date.now(), { lower: true }),
+                difficulty: computeDiffuculty(sequenceItems.length, duration),
+                sequence: [...sequenceItems],
+                duration,
+            }
+            await storeWorkout(workout);
+        }
+    }
+
     return (
         <View style={styles.container}>
-            <ExerciseForm
-                onSubmit={handleFormSubmit}
-            />
             <FlatList
                 data={sequenceItems}
                 keyExtractor={item => item.slug}
@@ -47,6 +77,32 @@ export default function PlannerScreen({ navigation }: NativeStackHeaderProps) {
                     </ExerciseItem>
                 }
             />
+            <ExerciseForm
+                onSubmit={handleFormSubmit}
+            />
+            <View>
+                <Modal
+                    activator={({ handleOpen }) =>
+                        <PressableText
+                            style={{ marginTop: 15 }}
+                            text="Create Workout"
+                            onPress={handleOpen}
+                        />
+                    }
+                >
+                    {({ handleClose }) =>
+                        <View>
+                            <WorkoutForm
+                                onSubmit={async (data) => {
+                                    await handleWorkoutSubmit(data)
+                                    handleClose()
+                                    navigation.navigate("Home")
+                                }}
+                            />
+                        </View>
+                    }
+                </Modal>
+            </View>
         </View>
     )
 };

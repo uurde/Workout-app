@@ -45,6 +45,7 @@ function BottomTabNavigator() {
                 name="Home"
                 component={HomeScreen}
                 options={{
+                    unmountOnBlur: true,
                     tabBarIcon: ({ size, color }) =>
                         <FontAwesome name="home" size={size} color={color} />
                     //tabBarIcon:({size, color}) şeklinde verirsek dark/light mode değişkeni yapabiliriz.
