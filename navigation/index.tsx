@@ -1,5 +1,6 @@
+import { ColorSchemeName } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, DarkTheme, DefaultTheme } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, Entypo } from '@expo/vector-icons';
 
@@ -7,9 +8,11 @@ import HomeScreen from "../screens/HomeScreen";
 import PlannerScreen from "../screens/PlannerScreen";
 import WorkoutDetailScreen from "../screens/WorkoutDetailScreen";
 
-export default function Navgation() {
+export default function Navgation({ colorScheme }: { colorScheme: ColorSchemeName }) {
     return (
-        <NavigationContainer>
+        <NavigationContainer
+            theme={colorScheme === "light" ? DefaultTheme : DarkTheme}
+        >
             <RootNavigator />
         </NavigationContainer>
     )
@@ -30,7 +33,7 @@ function RootNavigator() {
             <Stack.Screen
                 name="WorkoutDetail"
                 component={WorkoutDetailScreen}
-                options={{title: "Workout Info"}}
+                options={{ title: "Workout Info" }}
             />
         </Stack.Navigator>
     )

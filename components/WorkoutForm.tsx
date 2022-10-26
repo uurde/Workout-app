@@ -31,7 +31,7 @@ export default function WorkoutForm({ onSubmit }: WorkoutProps) {
                 }
             />
             <PressableText
-                style={{ marginTop: 15 }}
+                style={{ marginTop: 10 }}
                 text="Confirm"
                 onPress={handleSubmit((data) => {
                     onSubmit(data as WorkoutFormData);
@@ -46,7 +46,6 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         borderRadius: 10,
         padding: 10,
-        marginBottom: 10
     },
     input: {
         width: 200,
